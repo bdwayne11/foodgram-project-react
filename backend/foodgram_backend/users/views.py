@@ -1,14 +1,13 @@
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-from .models import CustomUser
-from api.serializers import GetUserSerializer, SubscribeSerializer
-
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Subscribe
+from api.serializers import GetUserSerializer, SubscribeSerializer
+
+from .models import CustomUser, Subscribe
 
 
 class CustomUserViewSet(UserViewSet):
@@ -65,9 +64,6 @@ class CustomUserViewSet(UserViewSet):
     def subscriptions(self, request):
         user = request.user
         queryset = CustomUser.objects.filter(following__user=user)
-        # obj_1 = CustomUser.objects.get(id=1) #Понять почему сделал правильно
-        # obj_2 = CustomUser.objects.get(id=3)
-        # print(obj_1.following.all(), obj_1.follower.all(), obj_2.following.all(), obj_2.follower.all(), sep='$$$')
         page = self.paginate_queryset(queryset)
         serializer = SubscribeSerializer(
             page,

@@ -1,6 +1,5 @@
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
-from django.core.validators import (RegexValidator,
-                                    MinValueValidator)
 
 from users.models import CustomUser
 
@@ -58,7 +57,8 @@ class Recipe(models.Model):
         Tag, related_name='recipes', verbose_name='Тег'
     )
     author = models.ForeignKey(
-        CustomUser, on_delete=models.SET_DEFAULT, default='Удаленный пользователь',
+        CustomUser, on_delete=models.SET_DEFAULT,
+        default='Удаленный пользователь',
         null=True, verbose_name='Автор', related_name='recipes'
     )
     ingredients = models.ManyToManyField(
@@ -78,10 +78,10 @@ class Recipe(models.Model):
 class IngredientsRecipes(models.Model):
     recipe = models.ForeignKey(
         Recipe, on_delete=models.CASCADE, verbose_name='Рецепт',
-        related_name='ingredients_list'
     )
     ingredient = models.ForeignKey(
-        Ingredients, on_delete=models.CASCADE, verbose_name='Ингридиент в рецепте',
+        Ingredients, on_delete=models.CASCADE,
+        verbose_name='Ингридиент в рецепте',
     )
     amount = models.IntegerField(
         'Количество в шт',
