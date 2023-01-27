@@ -8,7 +8,7 @@ from djoser.serializers import UserSerializer
 from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
 
-from recepts.models import (Basket, Favourites, Ingredients,
+from recipes.models import (Basket, Favourites, Ingredients,
                             IngredientsRecipes, Recipe, Tag)
 from users.models import CustomUser, Subscribe
 
@@ -49,36 +49,10 @@ class CreateIngredientsRecipesSerializer(serializers.ModelSerializer):
         fields = ('id', 'amount')
 
 
-# class IngredientsRecipesSerializer(serializers.ModelSerializer):
-#     name = serializers.SlugRelatedField(
-#         read_only=True,
-#         source='ingredient',
-#         slug_field='name'
-#     )
-#     measurement_unit = serializers.SlugRelatedField(
-#         read_only=True,
-#         source='ingredient',
-#         slug_field='measurement_unit'
-#     )
-#
-#     class Meta:
-#         model = IngredientsRecipes
-#         fields = (
-#             'id',
-#             'name',
-#             'measurement_unit',
-#             'amount'
-#         )
-
-
 class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
     image = serializers.CharField(source="image.url")
     author = GetUserSerializer(read_only=True)
-    # ingredients = IngredientsSerializer(read_only=True, many=True)
-    # кажется, что это неправильно работает. amount?
-    # ingredients = IngredientsRecipesSerializer(many=True, read_only=True)
-    # это тоже не хочет работать...
     ingredients = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -143,40 +117,63 @@ class WriteRecipesSerializer(serializers.ModelSerializer):
         fields = ('ingredients', 'tags', 'image', 'name',
                   'text', 'cooking_time')
 
-    # Предполагаю, что сюда нужны транзацкии. Это так?
-
     @transaction.atomic
     def create(self, validated_data):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-        obj = [IngredientsRecipes(ingredient=Ingredients.objects.get(
-            id=ing['id']
-        ),
-                                  recipe=recipe,
-                                  amount=ing['amount'])
-               for ing in ingredients]
-        IngredientsRecipes.objects.bulk_create(obj)
+        self.create_ingredients(recipe, ingredients)
         return recipe
 
     @transaction.atomic
     def update(self, instance, validated_data):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
-        # instance = Recipe.objects.update(**validated_data)
-        # почему это не работает????
         instance = super().update(instance, validated_data)
         instance.tags.clear()
         instance.tags.set(tags)
-        IngredientsRecipes.objects.filter(recipe=instance).delete()
+        self.create_ingredients(recipe=instance, ingredients=ingredients)
+        return instance
+
+    @transaction.atomic
+    def create_ingredients(self, recipe, ingredients):
+        IngredientsRecipes.objects.filter(recipe=recipe).delete()
         IngredientsRecipes.objects.bulk_create([IngredientsRecipes(
             ingredient=Ingredients.objects.get(id=ing['id']),
-            recipe=instance,
+            recipe=recipe,
             amount=ing['amount']
         ) for ing in ingredients])
 
-        return instance
+    def validate(self, attrs):
+        ingredients_list = []
+        tags_list = []
+        ingredients = attrs['ingredients']
+        tags = attrs['tags']
+
+        # Проверка ингридиентов
+        if not ingredients:
+            raise ValidationError('В рецепте должен быть хотя бы 1 ингридиент.')
+        for ing in ingredients:
+            ingredient = Ingredients.objects.get(id=ing['id'])
+            if ingredient in ingredients_list:
+                raise ValidationError('Игредиенты не могут повторяться')
+            if ing['amount'] <= 0:
+                raise ValidationError('Количество ингридиента не может быть меньше 0')
+            ingredients_list.append(ingredient)
+
+        # Проверка тегов
+        if not tags:
+            raise ValidationError('Необходимо указать хотя бы 1 тег!')
+        for tag in tags:
+            if tag in tags_list:
+                raise ValidationError('Теги должны быть уникальными!')
+            tags_list.append(tag)
+
+        if not attrs['cooking_time'] > 0:
+            raise ValidationError('Время готовки не может быть меньше 1 минуты!')
+
+        return attrs
 
     def to_representation(self, instance):
         return RecipeSerializer(instance,

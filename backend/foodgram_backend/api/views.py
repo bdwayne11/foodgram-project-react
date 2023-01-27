@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from recepts.models import (Basket, Favourites, Ingredients,
+from recipes.models import (Basket, Favourites, Ingredients,
                             IngredientsRecipes, Recipe, Tag)
 
 from .filters import IngredientSearchFilter, RecipeFilter
@@ -15,6 +15,7 @@ from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (IngredientsSerializer, RecipeSerializer,
                           ShortRecipesSerializer, TagSerializer,
                           WriteRecipesSerializer)
+from .utils import create_txt
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -36,7 +37,7 @@ class IngredientsViewSet(viewsets.ModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    permission_classes = (IsAdminOrReadOnly | IsAuthorOrReadOnly)
+    permission_classes = (IsAdminOrReadOnly, IsAuthorOrReadOnly)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
@@ -111,18 +112,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'ingredient__name',
             'ingredient__measurement_unit',
         ).annotate(amount=Sum('amount'))
-
-        first_string = (
-            f'Пользователь {user.get_full_name()} \n\n'
-        )
-        shoping_list = '\n'.join([f'{ing["ingredient__name"]} '
-                                  f'{ing["amount"]} '
-                                  f'{ing["ingredient__measurement_unit"]}'
-                                  for ing in ingredients_value])
-        footer = '\n\n\nFoodgram project'
-
-        ready_list = first_string + shoping_list + footer
-        filename = f'{user.username}_shopping_list.txt'
+        ready_list, filename = create_txt(user, ingredients_value)
         response = HttpResponse(ready_list, content_type='text/plain')
         response['Content-Disposition'] = f'attachment; filename={filename}'
         return response
