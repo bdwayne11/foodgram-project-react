@@ -35,8 +35,8 @@ class Ingredients(models.Model):
 
     class Meta:
         ordering = ('name',)
-        verbose_name = 'Ингридиент'
-        verbose_name_plural = 'Ингридиенты'
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
         return f'{self.name} {self.measurement_unit}'
@@ -63,7 +63,7 @@ class Recipe(models.Model):
     )
     ingredients = models.ManyToManyField(
         Ingredients, through='IngredientsRecipes', related_name='recipes',
-        verbose_name='Ингридиенты'
+        verbose_name='Ингредиенты',
     )
 
     class Meta:
@@ -78,10 +78,11 @@ class Recipe(models.Model):
 class IngredientsRecipes(models.Model):
     recipe = models.ForeignKey(
         Recipe, on_delete=models.CASCADE, verbose_name='Рецепт',
+        related_name='recipe'
     )
     ingredient = models.ForeignKey(
         Ingredients, on_delete=models.CASCADE,
-        verbose_name='Ингридиент в рецепте',
+        verbose_name='Ингредиент в рецепте',
     )
     amount = models.IntegerField(
         'Количество в шт',
@@ -91,8 +92,8 @@ class IngredientsRecipes(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Ингридиент в рецепте'
-        verbose_name_plural = 'Ингридиенты в рецептах'
+        verbose_name = 'Ингредиент в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецептах'
 
     def __str__(self):
         return (f'{self.ingredient.name} ({self.ingredient.measurement_unit}):'
