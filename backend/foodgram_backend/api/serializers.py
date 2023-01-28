@@ -133,12 +133,12 @@ class WriteRecipesSerializer(serializers.ModelSerializer):
         instance = super().update(instance, validated_data)
         instance.tags.clear()
         instance.tags.set(tags)
+        IngredientsRecipes.objects.filter(recipe=instance).delete()
         self.create_ingredients(recipe=instance, ingredients=ingredients)
         return instance
 
     @transaction.atomic
     def create_ingredients(self, recipe, ingredients):
-        IngredientsRecipes.objects.filter(recipe=recipe).delete()
         IngredientsRecipes.objects.bulk_create([IngredientsRecipes(
             ingredient=Ingredients.objects.get(id=ing['id']),
             recipe=recipe,
@@ -146,12 +146,12 @@ class WriteRecipesSerializer(serializers.ModelSerializer):
         ) for ing in ingredients])
 
     def validate(self, attrs):
-        ingredients_list = []
-        tags_list = []
+        ingredients_list = set()
+        tags_list = set()
         ingredients = attrs['ingredients']
         tags = attrs['tags']
 
-        # Проверка ингридиентов
+        # Проверка ингредиентов
         if not ingredients:
             raise ValidationError('В рецепте должен быть хотя бы 1 ингридиент.')
         for ing in ingredients:
@@ -160,7 +160,7 @@ class WriteRecipesSerializer(serializers.ModelSerializer):
                 raise ValidationError('Игредиенты не могут повторяться')
             if ing['amount'] <= 0:
                 raise ValidationError('Количество ингридиента не может быть меньше 0')
-            ingredients_list.append(ingredient)
+            ingredients_list.add(ingredient)
 
         # Проверка тегов
         if not tags:
@@ -168,7 +168,7 @@ class WriteRecipesSerializer(serializers.ModelSerializer):
         for tag in tags:
             if tag in tags_list:
                 raise ValidationError('Теги должны быть уникальными!')
-            tags_list.append(tag)
+            tags_list.add(tag)
 
         if not attrs['cooking_time'] > 0:
             raise ValidationError('Время готовки не может быть меньше 1 минуты!')
