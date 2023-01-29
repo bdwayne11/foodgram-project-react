@@ -1,10 +1,12 @@
 import os
 from pathlib import Path
-from decouple import config
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('DJANGO_SECRET_KEY')
+SECRET_KEY = os.getenv(key='DJANGO_SECRET_KEY')
 
 DEBUG = False
 
