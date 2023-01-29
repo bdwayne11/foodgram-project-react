@@ -153,13 +153,15 @@ class WriteRecipesSerializer(serializers.ModelSerializer):
 
         # Проверка ингредиентов
         if not ingredients:
-            raise ValidationError('В рецепте должен быть хотя бы 1 ингридиент.')
+            raise ValidationError('В рецепте должен быть хотя бы'
+                                  ' 1 ингридиент.')
         for ing in ingredients:
             ingredient = Ingredients.objects.get(id=ing['id'])
             if ingredient in ingredients_list:
                 raise ValidationError('Игредиенты не могут повторяться')
             if ing['amount'] <= 0:
-                raise ValidationError('Количество ингридиента не может быть меньше 0')
+                raise ValidationError('Количество ингридиента не может'
+                                      ' быть меньше 0')
             ingredients_list.add(ingredient)
 
         # Проверка тегов
@@ -171,7 +173,8 @@ class WriteRecipesSerializer(serializers.ModelSerializer):
             tags_list.add(tag)
 
         if not attrs['cooking_time'] > 0:
-            raise ValidationError('Время готовки не может быть меньше 1 минуты!')
+            raise ValidationError('Время готовки не может'
+                                  ' быть меньше 1 минуты!')
 
         return attrs
 
