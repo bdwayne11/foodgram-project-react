@@ -9,7 +9,7 @@ services:
       - ./.env
 
   backend:
-    image: boikodw11/foodgram_backend/:latest
+    image: boikodw11/foodgram_backend:latest
     restart: always
     volumes:
       - static_value:/app/static/django/
@@ -37,7 +37,8 @@ services:
       - static_value:/var/html/static/django/
       - media_value:/var/html/media/django/
     depends_on:
-      - web
+      - backend
+    restart: always
 
 volumes:
   db_value:
