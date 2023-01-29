@@ -43,7 +43,7 @@ jobs:
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2
         with:
-          context: foodgram_backend
+          context: backend/foodgram_backend
           push: true
           tags: boikodw11/foodgram_backend:latest
 
