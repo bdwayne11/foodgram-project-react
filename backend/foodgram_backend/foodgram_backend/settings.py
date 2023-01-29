@@ -1,10 +1,7 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv, find_dotenv
 
-raise Exception(os.environ)
-
-load_dotenv()
+# raise Exception(os.environ)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
