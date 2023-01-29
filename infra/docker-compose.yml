@@ -6,7 +6,7 @@ services:
     volumes:
       - db_value:/var/lib/postgresql/data/
     env_file:
-      - .env
+      - ./.env
 
   backend:
     image: boikodw11/foodgram_backend:latest
@@ -19,7 +19,7 @@ services:
       - db
 
     env_file:
-      - .env
+      - ./.env
 
   frontend:
     image: boikodw11/foodgram_frontend:latest
