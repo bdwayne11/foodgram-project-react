@@ -69,7 +69,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/_build/
+backend/foodgram_backend/api/docs/_build/
 
 # PyBuilder
 target/
