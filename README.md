@@ -1,6 +1,10 @@
 Foodgram project
 ========
 
+
+![workflow](https://github.com/bdwayne11/foodgram-project-react/actions/workflows/foodgram_project_react_workflow.yml/badge.svg?branch=master&event=push)
+
+
 Foodgram - продуктовый помощник с базой кулинарных рецептов. Позволяет публиковать рецепты, сохранять избранные, а также формировать список покупок для выбранных рецептов. Можно подписываться на любимых авторов.
 
 Адрес проекта: http://158.160.40.65
