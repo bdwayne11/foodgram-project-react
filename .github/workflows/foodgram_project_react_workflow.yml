@@ -104,9 +104,9 @@ jobs:
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
             echo DJ_SECRET_KEY=${{ secrets.DJ_SECRET_KEY }} >> .env
             
-            sudo docker compose rm backend
+            sudo docker compose rm boikodw_backend_1
             sudo docker pull boikodw11/foodgram_backend:latest
-            sudo docker compose rm frontend
+            sudo docker compose rm boikodw_frontend_1
             sudo docker pull boikodw11/foodgram_frontend:latest
             
             sudo docker-compose up -d --build
