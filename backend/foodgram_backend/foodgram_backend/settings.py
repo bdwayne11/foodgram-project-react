@@ -5,7 +5,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv(key='DJANGO_SECRET_KEY')
+SECRET_KEY = os.getenv(key='DJ_SECRET_KEY')
 
 DEBUG = True
 
@@ -114,6 +114,7 @@ REST_FRAMEWORK = {
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
+    'HIDE_USERS': False,
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
