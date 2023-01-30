@@ -9,8 +9,8 @@ services:
       - ./.env
 
   backend:
-#    image: boikodw11/foodgram_backend:latest
-    build: ../backend/foodgram_backend/
+    image: boikodw11/foodgram_backend:latest
+#    build: ../backend/foodgram_backend/
     restart: always
     volumes:
       - static_value:/app/static/django/

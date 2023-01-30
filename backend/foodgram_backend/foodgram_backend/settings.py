@@ -5,9 +5,9 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv(key='DJ_SECRET_KEY')
+SECRET_KEY = os.getenv(key='DJ_SECRET_KEY', default='1e021ke0k!@$@!ed2141@$12fwef1')
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*', '158.160.40.65']
 
