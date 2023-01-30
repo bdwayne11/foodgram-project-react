@@ -4,7 +4,7 @@ import uuid
 from django.core.files.base import ContentFile
 from django.db import transaction
 from django.db.models import F
-from djoser.serializers import UserSerializer, UserCreateSerializer
+from djoser.serializers import UserSerializer
 from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
 
