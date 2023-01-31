@@ -9,9 +9,6 @@ Foodgram - продуктовый помощник с базой кулинар�
 
 Адрес проекта: http://158.160.40.65
 
-### Для ревью: http://158.160.40.65, admin@admin.ru, pass: admin
-
-
 ### Технологии
 Python, Django, Django Rest Framework, Docker, Gunicorn, NGINX, PostgreSQL, Yandex Cloud, Continuous Integration, Continuous Deployment
 
